@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>SURVIVE — Elite Class</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#050505;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+.wrap{width:100%;max-width:390px;background:#0a0a0a;min-height:100vh;color:#fff;position:relative;padding-bottom:70px;}
+
+/* NAV */
+.nav{display:flex;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;background:#0a0a0a;border-top:0.5px solid #1e1e1e;z-index:100;}
+.nav-btn{flex:1;padding:12px 0 16px;text-align:center;font-size:9px;letter-spacing:0.15em;color:#444;cursor:pointer;border-top:2px solid transparent;}
+.nav-btn.active{color:#c9a84c;border-top-color:#c9a84c;}
+
+.screen{display:none;}.screen.active{display:block;}
+.gold{color:#c9a84c;}.red{color:#e74c3c;}.dim{color:#555;}
+
+/* HEADER */
+.hdr{padding:52px 20px 14px;border-bottom:0.5px solid #1e1e1e;}
+.app-logo{font-size:10px;letter-spacing:0.35em;color:#c9a84c;margin-bottom:2px;}
+.app-name{font-size:26px;font-weight:600;letter-spacing:0.05em;}
+.app-tag{font-size:10px;color:#444;letter-spacing:0.1em;margin-top:2px;}
+
+/* CARDS */
+.sect{margin:14px 16px 0;}
+.card{background:#0f0f0f;border:0.5px solid #2a2a2a;border-radius:12px;padding:14px 16px;}
+.card-gold{background:#0f0f0f;border:0.5px solid #2a2a2a;border-left:2px solid #c9a84c;border-radius:12px;padding:14px 16px;}
+.card-red{background:#0d0000;border:0.5px solid #2a1515;border-left:2px solid #e74c3c;border-radius:12px;padding:14px 16px;}
+.lbl{font-size:10px;letter-spacing:0.25em;color:#555;margin-bottom:10px;}
+.lbl-gold{font-size:10px;letter-spacing:0.25em;color:#c9a84c;margin-bottom:10px;}
+.lbl-red{font-size:10px;letter-spacing:0.25em;color:#e74c3c;margin-bottom:10px;}
+
+/* SURVIVAL BANNER */
+.big-num{font-size:44px;font-weight:600;line-height:1;}
+.pbar-out{height:3px;background:#1e1e1e;border-radius:2px;margin:8px 0 5px;}
+.pbar-in{height:3px;background:#c9a84c;border-radius:2px;transition:width 0.5s;}
+
+/* STATS */
+.stats3{display:flex;gap:8px;margin:14px 16px 0;}
+.sbox{flex:1;background:#0f0f0f;border:0.5px solid #2a2a2a;border-radius:10px;padding:12px 8px;text-align:center;}
+.snum{font-size:18px;font-weight:600;color:#c9a84c;line-height:1;margin-bottom:4px;}
+.slbl{font-size:9px;letter-spacing:0.1em;color:#444;}
+
+/* WEEK DOTS */
+.dot-row{display:flex;gap:5px;justify-content:space-between;margin-top:10px;}
+.dcol{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.dot{width:100%;aspect-ratio:1;border-radius:8px;background:#1e1e1e;max-width:38px;}
+.dot.done{background:#c9a84c;}
+.dot.today{background:#1e1800;border:0.5px solid #c9a84c;}
+.dname{font-size:9px;color:#444;}
+
+/* ROWS */
+.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid #141414;font-size:13px;}
+.row:last-child{border-bottom:none;}
+.row.you{background:#0d0d00;margin:0 -16px;padding:10px 16px;}
+.ava{width:30px;height:30px;border-radius:50%;background:#1e1e1e;display:flex;align-items:center;justify-content:center;font-size:10px;color:#666;flex-shrink:0;}
+.ava-gold{background:#1e1800;border:0.5px solid #3a3000;color:#c9a84c;}
+
+/* RARITY */
+.rarity-cmp{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.rc-row{display:flex;align-items:center;gap:8px;font-size:10px;color:#555;}
+.rc-bar{flex:1;height:2px;background:#1e1e1e;border-radius:1px;}
+.rc-fill{height:2px;border-radius:1px;background:#2a2a2a;}
+.rc-fill.you{background:#c9a84c;}
+
+/* BUTTONS */
+.btn-gold{width:100%;margin-top:12px;background:#1a1500;border:0.5px solid #c9a84c;border-radius:10px;padding:15px;color:#c9a84c;font-size:12px;letter-spacing:0.2em;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;}
+.btn-gold:active{opacity:0.7;}
+.btn-dim{width:100%;margin-top:8px;background:transparent;border:0.5px solid #2a2a2a;border-radius:10px;padding:13px;color:#555;font-size:11px;letter-spacing:0.15em;cursor:pointer;font-family:inherit;}
+
+/* RANK BADGE */
+.rank-badge{font-size:10px;padding:3px 12px;border-radius:20px;background:#1a1500;color:#c9a84c;border:0.5px solid #3a3000;letter-spacing:0.1em;}
+
+/* CLASS SELECTOR */
+.cls-btn{flex:1;padding:9px;text-align:center;border-radius:8px;cursor:pointer;font-size:12px;letter-spacing:0.1em;transition:all 0.2s;-webkit-tap-highlight-color:transparent;}
+
+/* PROFILE */
+.profile-top{padding:52px 20px 20px;text-align:center;border-bottom:0.5px solid #1e1e1e;}
+.p-ava{width:70px;height:70px;border-radius:50%;background:#1a1800;border:1.5px solid #c9a84c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600;color:#c9a84c;margin:0 auto 12px;}
+.p-name{font-size:18px;font-weight:600;margin-bottom:4px;}
+.p-class{font-size:10px;letter-spacing:0.2em;color:#c9a84c;}
+
+/* CLASS HISTORY */
+.class-trans{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0;}
+.cbadge{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.cring{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;}
+.cring.prev{background:#141414;border:1.5px solid #2a2a2a;color:#555;}
+.cring.now{background:#1a1500;border:1.5px solid #c9a84c;color:#c9a84c;}
+.carr{display:flex;align-items:center;}
+.carr-line{width:18px;height:2px;background:#c9a84c;}
+.carr-tip{width:0;height:0;border-left:6px solid #c9a84c;border-top:4px solid transparent;border-bottom:4px solid transparent;}
+
+/* NOTIF */
+.notif{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:0.5px solid #141414;}
+.notif:last-child{border-bottom:none;}
+.n-dot-wrap{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.n-dot{width:8px;height:8px;border-radius:50%;}
+.n-title{font-size:13px;font-weight:500;margin-bottom:3px;}
+.n-sub{font-size:11px;color:#555;line-height:1.4;}
+.n-time{font-size:10px;color:#444;margin-left:auto;flex-shrink:0;white-space:nowrap;}
+
+/* INPUT */
+.inp{width:100%;background:#0f0f0f;border:0.5px solid #2a2a2a;border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;font-family:inherit;outline:none;-webkit-appearance:none;}
+.inp::placeholder{color:#444;}
+.inp:focus{border-color:#c9a84c;}
+
+/* ALERT CARD */
+.alert-card{display:flex;align-items:center;gap:12px;background:#120a0a;border:0.5px solid #2a1515;border-radius:12px;padding:13px 14px;}
+
+/* HABIT OPTION */
+.habit-opt{padding:12px 14px;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:8px;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}
+.habit-opt:last-child{margin-bottom:0;}
+.habit-opt.selected{background:#1a1500;border:0.5px solid #c9a84c;color:#c9a84c;}
+.habit-opt.unselected{background:#0f0f0f;border:0.5px solid #2a2a2a;color:#555;}
+
+/* PROMOTION / DEMOTION SCREEN */
+.event-screen{display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;height:100%;background:#0a0a0a;z-index:200;overflow-y:auto;padding-bottom:40px;}
+.event-screen.active{display:block;}
+.event-close{position:absolute;top:50px;right:20px;font-size:12px;color:#555;letter-spacing:0.15em;cursor:pointer;padding:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HOME -->
+  <div class="screen active" id="s-home">
+    <div class="hdr">
+      <div class="app-logo">SURVIVE</div>
+      <div class="app-name">Elite Class</div>
+      <div class="app-tag">— 脱落するか、残り続けるか —</div>
+    </div>
+
+    <div class="sect card-gold">
+      <div class="lbl-gold">TODAY'S SURVIVAL RATE</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;">
+        <div class="big-num" id="survivor-count">3,412</div>
+        <div class="dim" style="font-size:12px;">/ 100,000人中</div>
+      </div>
+      <div class="pbar-out"><div class="pbar-in" id="pbar" style="width:3.4%"></div></div>
+      <div style="font-size:11px;color:#555;margin-top:2px;">あなたは上位 <span class="gold" id="pct-label">3.4%</span> の生存者です</div>
+    </div>
+
+    <div class="sect alert-card">
+      <div style="width:30px;height:30px;border-radius:50%;background:#1e0a0a;border:0.5px solid #3d1515;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <div style="width:9px;height:9px;border-radius:50%;background:#c0392b;"></div>
+      </div>
+      <div>
+        <div class="red" style="font-size:13px;font-weight:500;" id="dropout-text">本日の脱落者 847名</div>
+        <div class="dim" style="font-size:11px;margin-top:2px;">あなたはまだ生き残っています</div>
+      </div>
+    </div>
+
+    <div class="stats3">
+      <div class="sbox"><div class="snum" id="s-days">74</div><div class="slbl">DAYS</div></div>
+      <div class="sbox"><div class="snum" id="s-defeated">96,588</div><div class="slbl">DEFEATED</div></div>
+      <div class="sbox"><div class="snum" id="s-rarity">3.4%</div><div class="slbl">RARITY</div></div>
+    </div>
+
+    <div class="sect card">
+      <div class="lbl">YOUR RARITY</div>
+      <div style="font-size:13px;color:#888;line-height:1.7;margin-bottom:12px;">
+        30日継続できる人は<span class="gold">初恋の相手と結婚し<br>かつ浮気されない確率</span>と同じくらい希少です
+      </div>
+      <div class="rarity-cmp">
+        <div class="rc-row"><span style="min-width:54px;">開始時</span><div class="rc-bar"><div class="rc-fill" style="width:100%"></div></div><span style="min-width:36px;text-align:right;">100%</span></div>
+        <div class="rc-row"><span style="min-width:54px;">7日後</span><div class="rc-bar"><div class="rc-fill" style="width:42%"></div></div><span style="min-width:36px;text-align:right;">42%</span></div>
+        <div class="rc-row"><span style="min-width:54px;">30日後</span><div class="rc-bar"><div class="rc-fill" style="width:12%"></div></div><span style="min-width:36px;text-align:right;">12%</span></div>
+        <div class="rc-row" style="color:#c9a84c;"><span style="min-width:54px;">あなた今</span><div class="rc-bar"><div class="rc-fill you" id="your-rarity-bar" style="width:3.4%"></div></div><span style="min-width:36px;text-align:right;" id="your-rarity-pct">3.4%</span></div>
+      </div>
+    </div>
+
+    <div class="sect card" style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div class="lbl" style="margin:0;">THIS WEEK</div>
+        <div class="gold" style="font-size:12px;" id="streak-label">6日連続達成中</div>
+      </div>
+      <div class="dot-row">
+        <div class="dcol"><div class="dot done" id="d0"></div><div class="dname">MON</div></div>
+        <div class="dcol"><div class="dot done" id="d1"></div><div class="dname">TUE</div></div>
+        <div class="dcol"><div class="dot done" id="d2"></div><div class="dname">WED</div></div>
+        <div class="dcol"><div class="dot done" id="d3"></div><div class="dname">THU</div></div>
+        <div class="dcol"><div class="dot done" id="d4"></div><div class="dname">FRI</div></div>
+        <div class="dcol"><div class="dot done" id="d5"></div><div class="dname">SAT</div></div>
+        <div class="dcol"><div class="dot today" id="d6"></div><div class="dname">SUN</div></div>
+      </div>
+      <div id="today-btn-area">
+        <button class="btn-gold" onclick="completeToday()">— 今日のタスクを完了する —</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RANK -->
+  <div class="screen" id="s-rank">
+    <div style="padding:52px 20px 12px;border-bottom:0.5px solid #1e1e1e;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:16px;font-weight:600;">Class Ranking</div>
+      <div class="rank-badge" id="my-class-badge">S CLASS</div>
+    </div>
+
+    <div class="sect" style="display:flex;gap:8px;">
+      <div class="cls-btn" id="cls-S" onclick="setClass('S')" style="background:#1a1500;border:0.5px solid #c9a84c;color:#c9a84c;">S</div>
+      <div class="cls-btn" id="cls-A" onclick="setClass('A')" style="background:#0f0f0f;border:0.5px solid #2a2a2a;color:#555;">A</div>
+      <div class="cls-btn" id="cls-B" onclick="setClass('B')" style="background:#0f0f0f;border:0.5px solid #2a2a2a;color:#555;">B</div>
+      <div class="cls-btn" id="cls-C" onclick="setClass('C')" style="background:#0f0f0f;border:0.5px solid #2a2a2a;color:#555;">C</div>
+    </div>
+
+    <div class="sect card" id="rank-list"></div>
+
+    <div class="sect card" style="margin-bottom:14px;">
+      <div class="lbl">CLASS BOUNDARY</div>
+      <div style="font-size:12px;color:#666;line-height:1.9;">
+        Sクラス昇格条件 <span class="gold">週5日以上 × 継続60日以上</span><br>
+        降格条件 <span class="red">3日連続未達成</span><br>
+        <span style="color:#444;font-size:11px;">降格すると下のクラスの人に通知が届きます</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="screen" id="s-notif">
+    <div style="padding:52px 20px 12px;border-bottom:0.5px solid #1e1e1e;">
+      <div style="font-size:16px;font-weight:600;">Alert Feed</div>
+      <div style="font-size:11px;color:#555;margin-top:3px;" id="notif-count">本日847名が脱落</div>
+    </div>
+    <div id="notif-list"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="screen" id="s-profile">
+    <div class="profile-top">
+      <div class="p-ava" id="p-ava-init">あ</div>
+      <div class="p-name" id="p-name-disp">あなた</div>
+      <div class="p-class" id="p-class-disp">S CLASS — 上位 3.4%</div>
+    </div>
+
+    <div class="stats3">
+      <div class="sbox"><div class="snum" id="p-days">74</div><div class="slbl">DAYS</div></div>
+      <div class="sbox"><div class="snum" id="p-defeated">96,588</div><div class="slbl">DEFEATED</div></div>
+      <div class="sbox"><div class="snum" id="p-streak">6</div><div class="slbl">STREAK</div></div>
+    </div>
+
+    <div class="sect card-gold">
+      <div class="lbl-gold">CLASS HISTORY</div>
+      <div class="class-trans">
+        <div class="cbadge">
+          <div class="cring prev">C</div>
+          <div style="font-size:9px;color:#444;">1日目</div>
+        </div>
+        <div class="carr"><div class="carr-line"></div><div class="carr-tip"></div></div>
+        <div class="cbadge">
+          <div class="cring prev" style="color:#888;border-color:#444;">A</div>
+          <div style="font-size:9px;color:#444;">30日目</div>
+        </div>
+        <div class="carr"><div class="carr-line"></div><div class="carr-tip"></div></div>
+        <div class="cbadge">
+          <div class="cring now">S</div>
+          <div style="font-size:9px;color:#c9a84c;">60日目</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="lbl" style="margin-bottom:8px;">名前を設定する</div>
+      <input class="inp" id="name-inp" placeholder="ニックネーム（12文字まで）" maxlength="12" oninput="updateName(this.value)">
+    </div>
+
+    <div class="sect" style="margin-bottom:14px;">
+      <div class="lbl" style="margin-bottom:8px;">HABIT TYPE</div>
+      <div id="habit-opts">
+        <div class="habit-opt selected" onclick="selectHabit(this)">筋トレ</div>
+        <div class="habit-opt unselected" onclick="selectHabit(this)">ダイエット</div>
+        <div class="habit-opt unselected" onclick="selectHabit(this)">勉強</div>
+        <div class="habit-opt unselected" onclick="selectHabit(this)">読書</div>
+        <div class="habit-opt unselected" onclick="selectHabit(this)">早起き</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="nav">
+    <div class="nav-btn active" onclick="go('home',this)">HOME</div>
+    <div class="nav-btn" onclick="go('rank',this)">RANK</div>
+    <div class="nav-btn" onclick="go('notif',this)">ALERT</div>
+    <div class="nav-btn" onclick="go('profile',this)">ME</div>
+  </div>
+</div>
+
+<!-- PROMOTION EVENT -->
+<div class="event-screen" id="ev-promo">
+  <div style="background:#0d0d00;padding:60px 24px 24px;text-align:center;border-bottom:0.5px solid #1e1e00;">
+    <div style="font-size:10px;letter-spacing:0.3em;color:#c9a84c;margin-bottom:18px;">CLASS PROMOTION</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:18px;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:#141414;border:1.5px solid #2a2a2a;color:#555;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:600;">A</div>
+        <div style="font-size:9px;color:#444;letter-spacing:0.15em;">PREV</div>
+      </div>
+      <div style="display:flex;align-items:center;"><div style="width:22px;height:2px;background:#c9a84c;"></div><div style="width:0;height:0;border-left:7px solid #c9a84c;border-top:5px solid transparent;border-bottom:5px solid transparent;"></div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:#1a1500;border:1.5px solid #c9a84c;color:#c9a84c;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:600;">S</div>
+        <div style="font-size:9px;color:#c9a84c;letter-spacing:0.15em;">NOW</div>
+      </div>
+    </div>
+    <div style="font-size:22px;font-weight:600;margin-bottom:8px;">S CLASSに昇格しました</div>
+    <div style="font-size:12px;color:#555;line-height:1.7;">継続率上位 <span class="gold">3.4%</span> の生存者のみが到達できるクラスです</div>
+  </div>
+  <div style="display:flex;gap:8px;margin:16px 16px 0;">
+    <div style="flex:1;background:#0f0f0f;border:0.5px solid #2a2a2a;border-radius:10px;padding:12px;text-align:center;">
+      <div style="font-size:22px;font-weight:600;color:#c9a84c;" id="ev-days">74</div>
+      <div style="font-size:9px;letter-spacing:0.1em;color:#444;margin-top:3px;">DAYS SURVIVED</div>
+    </div>
+    <div style="flex:1;background:#0f0f0f;border:0.5px solid #2a2a2a;border-radius:10px;padding:12px;text-align:center;">
+      <div style="font-size:22px;font-weight:600;color:#c9a84c;">96,588</div>
+      <div style="font-size:9px;letter-spacing:0.1em;color:#444;margin-top:3px;">DEFEATED</div>
+    </div>
+  </div>
+  <div style="margin:14px 16px 0;background:#0f0f0f;border:0.5px solid #2a2a2a;border-left:2px solid #c9a84c;border-radius:10px;padding:14px 16px;">
+    <div class="lbl-gold">S CLASS UNLOCKED</div>
+    <div style="font-size:13px;color:#888;padding:6px 0;border-bottom:0.5px solid #141414;">Sクラス限定ランキングへのアクセス</div>
+    <div style="font-size:13px;color:#888;padding:6px 0;border-bottom:0.5px solid #141414;">脱落者リアルタイム通知（詳細版）</div>
+    <div style="font-size:13px;color:#888;padding:6px 0;">プロフィールに「S CLASS」バッジ表示</div>
+  </div>
+  <div style="margin:14px 16px 0;">
+    <button class="btn-gold" onclick="closeEvent('ev-promo')">— 確認する —</button>
+  </div>
+  <div style="text-align:center;margin-top:12px;font-size:11px;color:#444;letter-spacing:0.1em;cursor:pointer;" onclick="closeEvent('ev-promo')">閉じる</div>
+</div>
+
+<script>
+var state = {
+  days: 74,
+  streak: 6,
+  defeated: 96588,
+  survivors: 3412,
+  dropouts: 847,
+  todayDone: false,
+  name: 'あなた',
+  currentClass: 'S'
+};
+
+var rankings = {
+  S:[
+    {init:'TK',name:'T.Kawamoto',days:87,you:false,dropped:false},
+    {init:'YS',name:'Y.Suzuki',days:81,you:false,dropped:false},
+    {init:'YOU',name:'あなた',days:74,you:true,dropped:false},
+    {init:'HN',name:'H.Nakamura',days:71,you:false,dropped:false},
+    {init:'RT',name:'R.Tanaka',days:68,you:false,dropped:true},
+  ],
+  A:[
+    {init:'MK',name:'M.Kobayashi',days:55,you:false,dropped:false},
+    {init:'RY',name:'R.Yamamoto',days:52,you:false,dropped:false},
+    {init:'SH',name:'S.Hayashi',days:48,you:false,dropped:false},
+    {init:'KW',name:'K.Watanabe',days:45,you:false,dropped:true},
+  ],
+  B:[
+    {init:'AO',name:'A.Ono',days:28,you:false,dropped:false},
+    {init:'TM',name:'T.Matsuda',days:24,you:false,dropped:false},
+    {init:'YK',name:'Y.Kimura',days:20,you:false,dropped:true},
+  ],
+  C:[
+    {init:'HI',name:'H.Inoue',days:10,you:false,dropped:false},
+    {init:'NF',name:'N.Fujita',days:7,you:false,dropped:false},
+    {init:'KS',name:'K.Sato',days:4,you:false,dropped:true},
+  ]
+};
+
+var notifications = [
+  {type:'drop',title:'本日の脱落者 847名',sub:'過去24時間で脱落しました',time:'今'},
+  {type:'drop',title:'R.Tanakaが脱落しました',sub:'Sクラスから1名脱落 — あなたの順位が上昇',time:'2時間前'},
+  {type:'up',title:'あなたはSクラス3位です',sub:'H.Nakamuraとの差は3日',time:'6時間前'},
+  {type:'drop',title:'昨日 1,204名が脱落',sub:'全体の1.2%がここ24時間で消えました',time:'昨日'},
+  {type:'up',title:'週間生存率 上位3.4%',sub:'継続74日 — 希少度が上昇しています',time:'昨日'},
+  {type:'drop',title:'Aクラスから32名が脱落',sub:'あなたがSクラスにいる理由です',time:'2日前'},
+];
+
+function go(id, el) {
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('s-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='rank') renderRank(state.currentClass);
+  if(id==='notif') renderNotif();
+  window.scrollTo(0,0);
+}
+
+function renderRank(cls) {
+  state.currentClass = cls;
+  var list = rankings[cls];
+  var html = '<div class="lbl">'+cls+' CLASS</div>';
+  list.forEach(function(p,i){
+    var youCls = p.you?' you':'';
+    var avaCls = p.you?' ava-gold':'';
+    var nameStyle = p.dropped?'text-decoration:line-through;color:#444;':(p.you?'color:#c9a84c;font-weight:500;':'color:#888;');
+    var daysStyle = p.dropped?'color:#e74c3c;font-size:11px;':(p.you?'color:#c9a84c;':'color:#555;');
+    var numStyle = p.dropped?'color:#e74c3c;':'(p.you?color:#c9a84c;:color:#444;)';
+    html+='<div class="row'+youCls+'">';
+    html+='<div style="width:18px;text-align:center;font-size:11px;color:'+(p.dropped?'#e74c3c':(p.you?'#c9a84c':'#444'))+';">'+(p.dropped?'—':(i+1))+'</div>';
+    html+='<div class="ava'+avaCls+'">'+(p.dropped?'✕':p.init)+'</div>';
+    html+='<div style="flex:1;font-size:13px;'+nameStyle+'">'+p.name+'</div>';
+    html+='<div style="font-size:12px;'+daysStyle+'">'+(p.dropped?'本日脱落':p.days+'日')+'</div>';
+    html+='</div>';
+  });
+  document.getElementById('rank-list').innerHTML = html;
+  ['S','A','B','C'].forEach(function(c){
+    var el = document.getElementById('cls-'+c);
+    if(c===cls){el.style.background='#1a1500';el.style.borderColor='#c9a84c';el.style.color='#c9a84c';}
+    else{el.style.background='#0f0f0f';el.style.borderColor='#2a2a2a';el.style.color='#555';}
+  });
+}
+
+function renderNotif() {
+  var html='';
+  notifications.forEach(function(n){
+    var isDrop=n.type==='drop';
+    var bg=isDrop?'#1e0a0a':'#1a1500';
+    var dot=isDrop?'#c0392b':'#c9a84c';
+    var title=isDrop?'#e74c3c':'#c9a84c';
+    html+='<div class="notif">';
+    html+='<div class="n-dot-wrap" style="background:'+bg+';"><div class="n-dot" style="background:'+dot+';"></div></div>';
+    html+='<div style="flex:1;"><div class="n-title" style="color:'+title+';">'+n.title+'</div><div class="n-sub">'+n.sub+'</div></div>';
+    html+='<div class="n-time">'+n.time+'</div>';
+    html+='</div>';
+  });
+  document.getElementById('notif-list').innerHTML=html;
+  document.getElementById('notif-count').textContent='本日'+state.dropouts.toLocaleString()+'名が脱落';
+}
+
+function completeToday() {
+  if(state.todayDone) return;
+  state.todayDone=true;
+  state.streak++;
+  state.days++;
+  state.defeated+=Math.floor(Math.random()*60)+20;
+  document.getElementById('d6').className='dot done';
+  document.getElementById('streak-label').textContent=state.streak+'日連続達成中';
+  document.getElementById('s-days').textContent=state.days;
+  document.getElementById('p-days').textContent=state.days;
+  document.getElementById('p-streak').textContent=state.streak;
+  document.getElementById('s-defeated').textContent=state.defeated.toLocaleString();
+  document.getElementById('p-defeated').textContent=state.defeated.toLocaleString();
+  document.getElementById('today-btn-area').innerHTML='<div style="text-align:center;padding:14px;font-size:12px;color:#c9a84c;letter-spacing:0.2em;">— 本日達成済 —</div>';
+  var newDrop=state.dropouts+Math.floor(Math.random()*40)+10;
+  state.dropouts=newDrop;
+  document.getElementById('dropout-text').textContent='本日の脱落者 '+newDrop.toLocaleString()+'名';
+  notifications.unshift({type:'up',title:'本日のタスク完了',sub:'あなたはまだ生き残っています — '+state.days+'日目',time:'たった今'});
+  rankings.S[2].days=state.days;
+  document.getElementById('ev-days').textContent=state.days;
+  setTimeout(function(){
+    document.getElementById('ev-promo').classList.add('active');
+    window.scrollTo(0,0);
+  },600);
+}
+
+function closeEvent(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+function updateName(v) {
+  if(!v) v='あなた';
+  state.name=v;
+  document.getElementById('p-name-disp').textContent=v;
+  document.getElementById('p-ava-init').textContent=v.charAt(0);
+  rankings.S[2].name=v;
+}
+
+function selectHabit(el) {
+  document.querySelectorAll('.habit-opt').forEach(function(d){
+    d.className='habit-opt unselected';
+  });
+  el.className='habit-opt selected';
+}
+
+renderRank('S');
+renderNotif();
+</script>
+</body>
+</html>
